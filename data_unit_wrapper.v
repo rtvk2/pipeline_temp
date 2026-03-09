@@ -79,8 +79,7 @@ module data_module(
     //  Hazard Unit Wires
     // =============================================================
     wire [1:0]  ForwardAE, ForwardBE;
-    wire        ForwardAD, ForwardBD;
-    wire        StallF, StallD, FlushE;
+    wire        StallF, StallD, FlushD, FlushE;
 
     // =============================================================
     //  IF STAGE
@@ -115,7 +114,7 @@ module data_module(
     if_id if_id_inst (
         .clk(clk),
         .reset(reset),
-        .flush(PCSrcE),          // Flush on branch taken
+        .flush(FlushD),           // Flush Decode stage on taken branch (FlushD=PCSrcE)
         .IF_ID_write(~StallD),   // Hold when stalled
         .IF_ID_pc_in(PCF),
         .IF_ID_instr_in(InstrF),
@@ -157,7 +156,7 @@ module data_module(
     id_ex id_ex_inst (
         .clk(clk),
         .reset(reset),
-        .flush(FlushE | PCSrcE),
+        .flush(FlushE),           // FlushE = lwstall | PCSrcE (hazard unit handles both)
         // Control In
         .mem_to_reg(MemtoRegD),
         .reg_write_en(RegWriteD),
@@ -301,25 +300,26 @@ module data_module(
     //  HAZARD UNIT
     // =============================================================
     hazard_unit hazard_inst (
-        .rsD(Rs1D),
-        .rtD(Rs2D),
+        // Forwarding unit inputs
         .rsE(Rs1E),
         .rtE(Rs2E),
-        .WriteRegE(RdE),
         .WriteRegM(RdM),
         .WriteRegW(RdW),
-        .RegWriteE(RegWriteE),
         .RegWriteM(RegWriteM),
         .RegWriteW(RegWriteW),
+        // Hazard detection inputs
+        .rsD(Rs1D),
+        .rtD(Rs2D),
+        .WriteRegE(RdE),
         .MemtoRegE(MemtoRegE),
-        .MemtoRegM(MemtoRegM),
-        .BranchD(BranchD),
+        // Control hazard input
+        .PCSrcE(PCSrcE),
+        // Outputs
         .ForwardAE(ForwardAE),
         .ForwardBE(ForwardBE),
-        .ForwardAD(ForwardAD),
-        .ForwardBD(ForwardBD),
         .StallF(StallF),
         .StallD(StallD),
+        .FlushD(FlushD),
         .FlushE(FlushE)
     );
 
