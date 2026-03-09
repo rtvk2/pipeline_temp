@@ -8,7 +8,7 @@ module hazard_unit(
     output StallF, StallD, FlushE
 );
 
-    // --- EXECUTE STAGE FORWARDING ---
+    // --- EX HAZARD: MEM->EX forwarding ---
     always @(*) begin
         if ((rsE != 0) && (rsE == WriteRegM) && RegWriteM)
             ForwardAE = 2'b10;
@@ -27,17 +27,16 @@ module hazard_unit(
             ForwardBE = 2'b00;
     end
 
-    // --- DECODE STAGE FORWARDING (For Branches) ---
-    assign ForwardAD = (rsD != 0) && (rsD == WriteRegM) && RegWriteM;
-    assign ForwardBD = (rtD != 0) && (rtD == WriteRegM) && RegWriteM;
+    // ForwardAD/ForwardBD: branch resolves in EX using normal ALU forwarding.
+    // These are kept for interface compatibility but not used by the datapath.
+    assign ForwardAD = 1'b0;
+    assign ForwardBD = 1'b0;
 
-    // --- STALL LOGIC ---
+    // --- LOAD-USE STALL ---
+    // Stall when ID instruction needs result of a load currently in EX
     wire lwstall;
-
-    // Load-Use Stall: stall when a load in EX is needed by next instruction in ID
     assign lwstall = ((rsD == WriteRegE) || (rtD == WriteRegE)) && MemtoRegE;
 
-    // Pipeline Control
     assign StallF = lwstall;
     assign StallD = lwstall;
     assign FlushE = lwstall;

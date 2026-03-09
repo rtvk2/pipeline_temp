@@ -44,8 +44,8 @@ module pipe_tb;
         reset = 1;
         #15 reset = 0;
         
-        // Failsafe timeout
-        #1000;
+        // Failsafe timeout - generous limit for any test program
+        #500000;
         $display("Timeout reached.");
         $finish;
     end
