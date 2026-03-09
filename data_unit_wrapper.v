@@ -11,7 +11,6 @@
 `include "mem_wb.v"
 `include "hazard_unit.v"
 
-// Pipelined RISC-V Datapath with Full Hazard Handling (Figure 7.61)
 module data_module(
     input clk,
     input reset,
@@ -114,8 +113,8 @@ module data_module(
     if_id if_id_inst (
         .clk(clk),
         .reset(reset),
-        .flush(FlushD),           // Flush Decode stage on taken branch (FlushD=PCSrcE)
-        .IF_ID_write(~StallD),   // Hold when stalled
+        .flush(FlushD),
+        .IF_ID_write(~StallD),
         .IF_ID_pc_in(PCF),
         .IF_ID_instr_in(InstrF),
         .IF_ID_pc_out(PCD),
@@ -156,7 +155,7 @@ module data_module(
     id_ex id_ex_inst (
         .clk(clk),
         .reset(reset),
-        .flush(FlushE),           // FlushE = lwstall | PCSrcE (hazard unit handles both)
+        .flush(FlushE),
         // Control In
         .mem_to_reg(MemtoRegD),
         .reg_write_en(RegWriteD),
@@ -300,21 +299,17 @@ module data_module(
     //  HAZARD UNIT
     // =============================================================
     hazard_unit hazard_inst (
-        // Forwarding unit inputs
         .rsE(Rs1E),
         .rtE(Rs2E),
         .WriteRegM(RdM),
         .WriteRegW(RdW),
         .RegWriteM(RegWriteM),
         .RegWriteW(RegWriteW),
-        // Hazard detection inputs
         .rsD(Rs1D),
         .rtD(Rs2D),
         .WriteRegE(RdE),
         .MemtoRegE(MemtoRegE),
-        // Control hazard input
         .PCSrcE(PCSrcE),
-        // Outputs
         .ForwardAE(ForwardAE),
         .ForwardBE(ForwardBE),
         .StallF(StallF),

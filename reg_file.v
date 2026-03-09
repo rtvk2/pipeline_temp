@@ -15,10 +15,8 @@ module reg_file(
     integer i;
     integer file;
     integer cycle_count;
-    // Asynchronous read with WB->ID internal forwarding (same-cycle write bypass)
     assign read_data1 = (reg_write_en && write_reg != 0 && write_reg == read_reg1) ? write_data : registers[read_reg1];
     assign read_data2 = (reg_write_en && write_reg != 0 && write_reg == read_reg2) ? write_data : registers[read_reg2];
-    // Synchronous write and cycle counting
     always @(posedge clk or posedge reset) begin
         if (reset) begin
             cycle_count <= 0;

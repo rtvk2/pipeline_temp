@@ -25,12 +25,10 @@ module pipe_tb;
     // Halt condition checking
     always @(posedge clk) begin
         if (!reset) begin
-            // We check if the instruction fetched is exactly 32'b0
             if (uut.DU_inst.InstrF === 32'b0 || uut.DU_inst.InstrF === 32'hxxxxxxxx) begin
                 $display("Halt condition met: Fetched an all 0 instruction.");
                 $display("Total Clock Cycles: %0d", cycle_count);
                 
-                // Writing register file manually if needed, or if reg_file handles it, wait minimal
                 $display("Terminating simulation. Dummy instructions discarded.");
                 $finish;
             end
@@ -44,7 +42,6 @@ module pipe_tb;
         reset = 1;
         #15 reset = 0;
         
-        // Failsafe timeout - generous limit for any test program
         #500000;
         $display("Timeout reached.");
         $finish;

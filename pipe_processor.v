@@ -13,8 +13,6 @@ module pipe_processor(
     wire BranchD, MemReadD, MemtoRegD, MemWriteD, ALUSrcD, RegWriteD;
     wire [3:0] ALUControlD;
     
-    // In pipelined architecture, Control Unit takes InstrD (Instruction from Decode Stage)
-    // and generates control signals for the Decode stage.
     control_unit_top CU_inst(
         .opcode(InstrD[6:0]),
         .instr11(InstrD[14:12]),
@@ -26,7 +24,7 @@ module pipe_processor(
         .MemWrite(MemWriteD),
         .ALUSrc(ALUSrcD),
         .RegWrite(RegWriteD),
-        .pc_src(), // Ignored in pipelined
+        .pc_src(),
         .ALUControl(ALUControlD)
     );
 
